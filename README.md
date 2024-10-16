@@ -11,7 +11,7 @@ For questions, please contact Jiacheng Zou at _jz3865 [at] columbia.edu_
 
 ## Data
 
-We provide the python code to automate building of 64 firm characteristics from [Freyberger et al, RFS 2020](https://academic.oup.com/rfs/article/33/5/2326/5821383) for users with access to [Wharton Research Data Services (WRDS)](https://wrds-www.wharton.upenn.edu/).  <br>
+We provide the python code to automate building of 64 firm characteristics from [Freyberger et al, RFS 2020](https://academic.oup.com/rfs/article/33/5/2326/5821383), and these firms' stock returns for users with access to [Wharton Research Data Services (WRDS)](https://wrds-www.wharton.upenn.edu/).  <br>
 
 First, users need to follow the instructions [here](https://docs.google.com/document/d/1hWdw7lofLNZHhWo9tJ_p0OlMmrIHLzIOB44Zy40EPG4/edit?usp=sharing) to manually click a few download links.  <br>
 
