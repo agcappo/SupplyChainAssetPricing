@@ -1,6 +1,8 @@
 # Supply Chain x Asset Pricing
 
-__A project that integrates supply chain graphs with risk factor zoo to build asset pricing factors__
+__A paper that integrates supply chain graphs with risk factor zoo to build asset pricing factors__
+
+The link to our paper draft is [here](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5031617).
 
 Authors: [Agostino Capponi](https://www.columbia.edu/~ac3827/), [Jose Sidaoui](https://ieor.columbia.edu/content/jose-sidaoui-gali), [Jiacheng Zou](https://jiachzou.github.io/). RA support by [Dehan Cui](https://www.linkedin.com/in/dehancui).
 
