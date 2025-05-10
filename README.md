@@ -20,3 +20,7 @@ First, users need to follow the instructions [here](https://docs.google.com/docu
 Then, running our python backend code in the jupyter _"FirmFeatures_Calculations.ipynb"_ (located in "Data" folder) produces a _"features.csv"_ file of the panel data of all NYSE, AMEX, and NASDAQ traded stocks in the user-specified date range.  <br>
 
 We document detailed formulas and variable names [here](https://docs.google.com/spreadsheets/d/1L9-sw4nrinA3j_lgsoJaKbawV0w-DLHXKzcfsmd6dGM/edit?usp=sharing).
+
+## Code
+
+_GNN code.ipynb_ is a self-contained jupyter notebook that implements our model in the paper.
