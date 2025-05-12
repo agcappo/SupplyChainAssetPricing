@@ -18,4 +18,4 @@ We document detailed formulas and variable names [here](https://docs.google.com/
 
 ## Code
 
-_GNN code.ipynb_ is a self-contained jupyter notebook that implements our model in the paper.
+_GNN code.ipynb_ is a self-contained jupyter notebook that implements our model in the paper. The first part of the notebook contains all of our functions to implement the benchmark models in our paper (PCA, RP-PCA, NC Ridge, NC LASSO) as well as the full implementation of our Graph-Neural Network model and construction of our asset pricing factors. The notebook may be run in order. The input datasets are "features.csv" produced from the jupyter notebook in the data folder, "ff_mon.csv" which are the monthly FF5 factors, and "features_and_supply_chain.csv" which is our merged features dataset with the supply chain relationship data. 
