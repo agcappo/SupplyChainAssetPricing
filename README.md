@@ -6,6 +6,7 @@ The link to our paper draft is [here](https://papers.ssrn.com/sol3/papers.cfm?ab
 
 Authors: [Agostino Capponi](https://www.columbia.edu/~ac3827/), [Jose Sidaoui](https://ieor.columbia.edu/content/jose-sidaoui-gali), [Jiacheng Zou](https://jiachzou.github.io/). RA support by [Dehan Cui](https://www.linkedin.com/in/dehancui).
 
+Contact [Jiacheng Zou](jiachengzou@gmail.com) or [Jose Sidaoui](jas2545@columbia.edu) for questions.
 ## Data
 
 We provide the python code to automate building of 64 firm characteristics from [Freyberger et al, RFS 2020](https://academic.oup.com/rfs/article/33/5/2326/5821383), and these firms' stock returns for users with access to [Wharton Research Data Services (WRDS)](https://wrds-www.wharton.upenn.edu/).  <br>
