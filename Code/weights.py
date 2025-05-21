@@ -1,0 +1,75 @@
+
+
+# In layers, use TransformerConv
+# adding weights
+def forward(self, x, edge_index, edge_weight=None):
+    x = self.bn(x)
+    for layer in self.layers:
+        x = F.elu(layer(x, edge_index, edge_attr=edge_weight))
+    x = F.dropout(x, p=0.5, training=self.training)
+    return self.out(x), x
+
+from torch_geometric.data import Data
+
+def prepare_graph_data(data, feature_cols, response_col, time_col='yyyymm', edge_weight_col=None):
+    """
+    Prepare graph data per month, supporting directed and weighted edges.
+    """
+    # Create a global node map (consistent node indexing across all months)
+    unique_keys = pd.concat([data['gvkey'], data['supplier_or_customer_gvkey']]).dropna().drop_duplicates()
+    global_node_map = pd.Series(data=np.arange(len(unique_keys)), index=unique_keys).to_dict()
+    num_nodes = len(global_node_map)
+
+    graphs_per_month = {}
+
+    for time, group in data.groupby(time_col):
+        x = np.random.randn(num_nodes, len(feature_cols)) / 100
+        y = torch.zeros(num_nodes)
+
+        edges_df = group[['gvkey', 'supplier_or_customer_gvkey', 'supplier_or_customer_flag']].copy()
+        edges_df['gvkey_idx'] = edges_df['gvkey'].map(global_node_map)
+        edges_df['partner_idx'] = edges_df['supplier_or_customer_gvkey'].map(global_node_map)
+        edges_df = edges_df.dropna(subset=['gvkey_idx', 'partner_idx'])
+
+        # Directed edges: 0 = supplier->customer, 1 = customer->supplier
+        edge_sources = np.where(edges_df['supplier_or_customer_flag'] == 0, edges_df['partner_idx'], edges_df['gvkey_idx'])
+        edge_targets = np.where(edges_df['supplier_or_customer_flag'] == 0, edges_df['gvkey_idx'], edges_df['partner_idx'])
+
+        edge_index = torch.tensor(np.vstack([edge_sources, edge_targets]), dtype=torch.long)
+
+        # Optional: include edge weights
+        if edge_weight_col and edge_weight_col in group.columns:
+            edge_weights_df = group[['gvkey', 'supplier_or_customer_gvkey', edge_weight_col]].drop_duplicates()
+            edge_weights_df['gvkey_idx'] = edge_weights_df['gvkey'].map(global_node_map)
+            edge_weights_df['partner_idx'] = edge_weights_df['supplier_or_customer_gvkey'].map(global_node_map)
+
+            # Same direction logic
+            edge_weights_df = edge_weights_df.dropna(subset=['gvkey_idx', 'partner_idx'])
+            edge_weights_df['source'] = np.where(edge_weights_df['supplier_or_customer_flag'] == 0,
+                                                 edge_weights_df['partner_idx'],
+                                                 edge_weights_df['gvkey_idx'])
+            edge_weights_df['target'] = np.where(edge_weights_df['supplier_or_customer_flag'] == 0,
+                                                 edge_weights_df['gvkey_idx'],
+                                                 edge_weights_df['partner_idx'])
+
+            # Merge weight info on (source, target)
+            weight_map = {(s, t): w for s, t, w in zip(edge_weights_df['source'], edge_weights_df['target'], edge_weights_df[edge_weight_col])}
+            edge_attr = torch.tensor([weight_map.get((s.item(), t.item()), 1.0) for s, t in zip(edge_sources, edge_targets)], dtype=torch.float).unsqueeze(1)
+        else:
+            edge_attr = torch.ones((edge_index.shape[1], 1), dtype=torch.float)  # default weight = 1
+
+        group = group.drop_duplicates(subset='gvkey')
+        for _, row in group.iterrows():
+            gvkey_idx = global_node_map[row['gvkey']]
+            x[gvkey_idx, :] = np.array([row[col] for col in feature_cols], dtype=np.float32)
+            if pd.notna(row[response_col]):
+                y[gvkey_idx] = row[response_col]
+
+        graphs_per_month[time] = Data(
+            x=torch.tensor(x, dtype=torch.float),
+            edge_index=edge_index,
+            edge_attr=edge_attr,  # <- added
+            y=y
+        )
+
+    return graphs_per_month, global_node_map
