@@ -1,13 +1,36 @@
 
 
 # In layers, use TransformerConv
-# adding weights
-def forward(self, x, edge_index, edge_weight=None):
-    x = self.bn(x)
-    for layer in self.layers:
-        x = F.elu(layer(x, edge_index, edge_attr=edge_weight))
-    x = F.dropout(x, p=0.5, training=self.training)
-    return self.out(x), x
+class GNNModel(nn.Module):
+    def __init__(self, num_features, embedding_dim, num_heads=2, num_layers=2, pca_dim=5):
+        super(GNNModel, self).__init__()
+        self.layers = nn.ModuleList()
+        self.bn = nn.BatchNorm1d(num_features)
+        mid_dim = 40
+        self.pca_dim = pca_dim
+        self.layer_type == 'Transformer'
+        self.bn_concat = nn.BatchNorm1d(pca_dim+1)  # concat_dim = scalar_pred_dim + pca_factors_dim
+        for i in range(num_layers):
+            in_channels = num_features if i == 0 else mid_dim
+            out_channels = embedding_dim if i == num_layers - 1 else mid_dim
+            self.layers.append(TransformerConv(in_channels, out_channels, heads=num_heads, concat=False, dropout=0.5))
+            
+
+        self.out_scalar = nn.Linear(embedding_dim, 1)                 # scalar output from embedding
+        self.out_final = nn.Linear(1 + pca_dim, 1)                    # final scalar using PCA + previous scalar
+
+    def forward(self, x, edge_index, pca_factors):
+        x = self.bn(x)
+        for layer in self.layers:
+            x = F.elu(layer(x, edge_index))
+        x = F.dropout(x, p=0.5, training=self.training)
+
+        # scalar_pred = self.out_scalar(x)                             # shape: (num_nodes, 1)
+        x_concat = torch.cat([F.elu(scalar_pred), pca_factors], dim=1)      
+        x_concat = self.bn_concat(x_concat) # normalize the concatenated output jointly
+        final_pred = self.out_final(x_concat)                        # shape: (num_nodes, 1)
+
+        return final_pred, x_concat
 
 from torch_geometric.data import Data
 
