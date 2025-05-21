@@ -15,9 +15,8 @@ class GNNModel(nn.Module):
             out_channels = embedding_dim if i == num_layers - 1 else mid_dim
             self.layers.append(TransformerConv(in_channels, out_channels, heads=num_heads, concat=False, dropout=0.5))
             
-
-        self.out_scalar = nn.Linear(embedding_dim, 1)                 # scalar output from embedding
-        self.out_final = nn.Linear(1 + pca_dim, 1)                    # final scalar using PCA + previous scalar
+        self.supply_chain_factor = nn.Linear(embedding_dim, 1)                 # scalar output from embedding
+        self.out = nn.Linear(1 + pca_dim, 1)                    # final scalar using PCA + previous scalar
 
     def forward(self, x, edge_index, pca_factors):
         x = self.bn(x)
@@ -25,12 +24,12 @@ class GNNModel(nn.Module):
             x = F.elu(layer(x, edge_index))
         x = F.dropout(x, p=0.5, training=self.training)
 
-        # scalar_pred = self.out_scalar(x)                             # shape: (num_nodes, 1)
-        x_concat = torch.cat([F.elu(scalar_pred), pca_factors], dim=1)      
+        x_supply_chain_factor = self.out_supply_chain_factor(x)                             # shape: (num_nodes, 1)
+        x_concat = torch.cat([F.elu(x_supply_chain_factor), pca_factors], dim=1)      
         x_concat = self.bn_concat(x_concat) # normalize the concatenated output jointly
-        final_pred = self.out_final(x_concat)                        # shape: (num_nodes, 1)
+        yhat = self.out(x_concat)                        # shape: (num_nodes, 1)
 
-        return final_pred, x_concat
+        return yhat, x_concat
 
 from torch_geometric.data import Data
 
