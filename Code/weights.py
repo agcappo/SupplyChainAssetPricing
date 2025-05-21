@@ -24,7 +24,7 @@ class GNNModel(nn.Module):
             x = F.elu(layer(x, edge_index))
         x = F.dropout(x, p=0.5, training=self.training)
 
-        x_supply_chain_factor = self.out_supply_chain_factor(x)                             # shape: (num_nodes, 1)
+        x_supply_chain_factor = self.supply_chain_factor(x)                             # shape: (num_nodes, 1)
         x_concat = torch.cat([F.elu(x_supply_chain_factor), pca_factors], dim=1)      
         x_concat = self.bn_concat(x_concat) # normalize the concatenated output jointly
         yhat = self.out(x_concat)                        # shape: (num_nodes, 1)
