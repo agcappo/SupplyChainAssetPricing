@@ -8,7 +8,7 @@ class GNNModel(nn.Module):
         self.bn = nn.BatchNorm1d(num_features)
         mid_dim = 40
         self.pca_dim = pca_dim
-        self.layer_type == 'Transformer'
+        self.layer_type = 'Transformer'
         self.bn_concat = nn.BatchNorm1d(pca_dim+1)  # concat_dim = scalar_pred_dim + pca_factors_dim
         for i in range(num_layers):
             in_channels = num_features if i == 0 else mid_dim
